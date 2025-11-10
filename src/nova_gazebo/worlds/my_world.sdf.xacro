@@ -1,0 +1,127 @@
+<?xml version="1.0"?>
+<sdf version="1.7" xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <!-- ======= Parameters (can be overridden at CLI/launch) ======= -->
+  <xacro:property name="container_l_uri" value="model://container_l"/>
+  <xacro:property name="container_m_uri" value="model://container_m"/>
+  <xacro:property name="conveyor_uri" value="model://conveyor"/>
+  <xacro:property name="object_uri" value="model://object"/>
+  <xacro:property name="sliding_cube_uri" value="model://sliding_cube"/>
+  <xacro:property name="platform_uri" value="model://platform"/>
+  <xacro:property name="platform_base_height" value="0.35"/>
+  <xacro:property name="initial_x" value="0.15"/>
+
+  <!-- Reusable macro to include a model with pose -->
+<xacro:macro name="spawn_model" params="name uri x y z roll pitch yaw static:=true">
+  <include>
+    <name>${name}</name>
+    <uri>${uri}</uri>
+    <pose>${x} ${y} ${z} ${roll} ${pitch} ${yaw}</pose>
+    <static>${static}</static>
+  </include>
+
+  <!-- ======= World Definition ======= -->
+</xacro:macro>
+  <world name="empty_world">
+    <!-- physics & atmosphere -->
+    <gravity>0 0 -9.81</gravity>
+    <!-- lighting -->
+    <light name="sun" type="directional">
+      <pose>0 0 10 0 0 0</pose>
+      <diffuse>1 1 1 1</diffuse>
+      <specular>0.1 0.1 0.1 1</specular>
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.5 -1</direction>
+      <cast_shadows>true</cast_shadows>
+    </light>
+
+    <!-- simple ground plane -->
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+          <material>
+            <ambient>0.5 0.5 0.5 1</ambient>
+            <diffuse>0.5 0.5 0.5 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Spawn your containers via the macro -->
+    <xacro:spawn_model
+        name="container_l"
+        uri="${container_l_uri}"
+        x="${initial_x}" y="0" z="${0.11+platform_base_height}"
+        roll="0" pitch="0" yaw="0"
+        static="false"/>
+
+    <xacro:spawn_model
+        name="container_m"
+        uri="${container_m_uri}"
+        x="${initial_x}" y="0" z="${0.12+platform_base_height}"
+        roll="0" pitch="0" yaw="0"
+        static="false"/>
+    <xacro:spawn_model
+        name="object"
+        uri="${object_uri}"
+        x="${initial_x}" y="0" z="${0.13+platform_base_height}"
+        roll="0" pitch="0" yaw="0"
+        static="false"/>
+    <xacro:spawn_model
+        name="conveyor_1"
+        uri="${conveyor_uri}"
+        x="-0.14" y="1.45" z="${platform_base_height}"
+        roll="0" pitch="0" yaw="0.0"
+        static="true"/>
+    <xacro:spawn_model
+        name="conveyor_2"
+        uri="${conveyor_uri}"
+        x="-0.14" y="0.45" z="${platform_base_height}"
+        roll="0" pitch="0" yaw="0.0"
+        static="true"/>
+    <xacro:spawn_model
+        name="conveyor_3"
+        uri="${conveyor_uri}"
+        x="0.14" y="-0.45" z="${platform_base_height}"
+        roll="0" pitch="0" yaw="3.14"
+        static="true"/>
+    <xacro:spawn_model
+        name="conveyor_4"
+        uri="${conveyor_uri}"
+        x="0.14" y="-1.45" z="${platform_base_height}"
+        roll="0" pitch="0" yaw="3.14"
+        static="true"/>                
+    
+    <xacro:spawn_model
+        name="sliding_cube"
+        uri="${sliding_cube_uri}"
+        x="${initial_x}" y="0" z="${0.1+platform_base_height}"
+        roll="0" pitch="0" yaw="0"
+        static="false"/>
+    <xacro:spawn_model
+        name="platform"
+        uri="${platform_uri}"
+        x="0" y="-0.0" z="0.45"
+        roll="0" pitch="0" yaw="0"/>
+  </world>
+</sdf>

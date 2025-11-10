@@ -1,0 +1,42 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <model name="sliding_cube">
+    <pose>0 0 1 0 0 0</pose>
+    <!-- 设置为动态体 -->
+    <static>false</static>
+
+    <link name="link">
+      <!-- 惯性定义（kg, m, kg·m²） -->
+      <inertial>
+        <mass>0.329</mass>
+        <pose>0 0 0.009172 0 0 0</pose>
+        <inertia>
+          <ixx>5.7268e-4</ixx>
+          <iyy>5.6166e-4</iyy>
+          <izz>1.1076e-3</izz>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyz>0</iyz>
+        </inertia>
+      </inertial>
+
+      <!-- 碰撞体：若几何尺寸以 mm 导出，则应改为米 -->
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <uri>model://sliding_cube/meshes/sliding_cube.dae</uri>
+          </mesh>
+        </geometry>
+      </collision>
+
+      <!-- 可视体：若 .dae 为 mm 单位，加 scale 进行换算 -->
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://sliding_cube/meshes/sliding_cube.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+  </model>
+</sdf>

@@ -1,0 +1,39 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <model name="container_m">
+    <pose>0 0 1 0 0 0</pose>
+    <static>false</static>
+
+    <link name="link_container_m">
+      <inertial>
+        <mass>0.059</mass>
+        <pose>0 0 0.006419 0 0 0</pose>
+        <inertia>
+          <ixx>2.6257e-5</ixx>
+          <iyy>2.6257e-5</iyy>
+          <izz>5.0783e-5</izz>
+          <ixy>0.0</ixy>
+          <ixz>0.0</ixz>
+          <iyz>0.0</iyz>
+        </inertia>
+      </inertial>
+
+      <!-- 注意尺寸单位已改为米 -->
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <uri>model://container_m/meshes/container_m.dae</uri>
+          </mesh>
+        </geometry>
+      </collision>
+
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://container_m/meshes/container_m.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+  </model>
+</sdf>

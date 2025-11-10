@@ -1,0 +1,37 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <model name="container_l">
+    <static>false</static>
+
+    <link name="link_container_l">
+      <inertial>
+        <mass>0.185</mass>
+        <pose>0 0 0.011014 0 0 0</pose>
+        <inertia>
+          <ixx>2.24613e-4</ixx>
+          <iyy>2.24613e-4</iyy>
+          <izz>4.23503e-4</izz>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyz>0</iyz>
+        </inertia>
+      </inertial>
+
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <uri>model://container_l/meshes/container_l.dae</uri>
+          </mesh>
+        </geometry>
+      </collision>
+
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://container_l/meshes/container_l.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+  </model>
+</sdf>

@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package>
+  <name>nova_description</name>
+  <version>0.0.0</version>
+  <description>The nova_description package</description>
+
+  <maintainer email="xuhao6815@gmail.com">TX_F</maintainer>
+
+  <license>BSD</license>
+
+  <author email="xuhao6815@gmail.com">TX_F</author>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <export>
+      <build_type>ament_cmake</build_type>
+       <gazebo_ros gz_model_path = "/home/hao/Desktop/conveyor_pick_platform/install/nova_description/share/nova_description" />
+  </export>
+
+</package>
