@@ -6,12 +6,13 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import  LaunchConfiguration, PathJoinSubstitution, TextSubstitution
 
 from launch.actions import SetEnvironmentVariable
+from launch_ros.actions import Node
 
 
 def generate_launch_description():
 
     world_arg = DeclareLaunchArgument(
-        'world', default_value='test_world.sdf',
+        'world', default_value='test2_world.sdf',
         description='Name of the Gazebo world file to load'
     )
 
@@ -32,9 +33,28 @@ def generate_launch_description():
         'on_exit_shutdown': 'true'}.items()
     )
 
+    gz_bridge_params_path = os.path.join(
+        get_package_share_directory('nova_description'),
+        'config',
+        'gz_bridge.yaml'
+    )
+    gz_bridge_node = Node(
+        package="ros_gz_bridge",
+        executable="parameter_bridge",
+        arguments=[
+            '--ros-args', '-p',
+            f'config_file:={gz_bridge_params_path}'
+        ],
+        output="screen",
+        parameters=[
+            {'use_sim_time': True},
+        ]
+    )
     launchDescriptionObject = LaunchDescription()
 
     launchDescriptionObject.add_action(world_arg)
+    launchDescriptionObject.add_action(gz_bridge_node)
+
     launchDescriptionObject.add_action(gazebo_launch)
 
     return launchDescriptionObject

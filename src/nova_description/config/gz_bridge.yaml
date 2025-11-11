@@ -1,0 +1,30 @@
+- ros_topic_name: "clock"
+  gz_topic_name: "clock"
+  ros_type_name: "rosgraph_msgs/msg/Clock"
+  gz_type_name: "gz.msgs.Clock"
+  direction: "GZ_TO_ROS"
+
+- ros_topic_name: "/sliding_cube0/cmd_vel"
+  gz_topic_name: "/model/sliding_cube0/cmd_vel"
+  ros_type_name: "geometry_msgs/msg/Twist"
+  gz_type_name: "gz.msgs.Twist"
+  direction: "ROS_TO_GZ"
+
+- ros_topic_name: "/sliding_cube1/cmd_vel"
+  gz_topic_name: "/model/sliding_cube1/cmd_vel"
+  ros_type_name: "geometry_msgs/msg/Twist"
+  gz_type_name: "gz.msgs.Twist"
+  direction: "ROS_TO_GZ"
+
+- ros_topic_name: "/sliding_cube2/cmd_vel"
+  gz_topic_name: "/model/sliding_cube2/cmd_vel"
+  ros_type_name: "geometry_msgs/msg/Twist"
+  gz_type_name: "gz.msgs.Twist"
+  direction: "ROS_TO_GZ"
+
+- ros_topic_name: "/sliding_cube3/cmd_vel"
+  gz_topic_name: "/model/sliding_cube3/cmd_vel"
+  ros_type_name: "geometry_msgs/msg/Twist"
+  gz_type_name: "gz.msgs.Twist"
+  direction: "ROS_TO_GZ"
+

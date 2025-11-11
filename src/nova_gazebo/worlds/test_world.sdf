@@ -5,6 +5,18 @@
 <!-- =================================================================================== -->
 <sdf version="1.7">
   <world name="empty_world">
+    <physics name='1ms' type='ignored'>
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1</real_time_factor>
+      <real_time_update_rate>1000</real_time_update_rate>
+    </physics>
+    <plugin name='gz::sim::systems::Physics' filename='gz-sim-physics-system'/>
+    <plugin name='gz::sim::systems::UserCommands' filename='gz-sim-user-commands-system'/>
+    <plugin name='gz::sim::systems::SceneBroadcaster' filename='gz-sim-scene-broadcaster-system'/>
+    <plugin
+      filename="gz-sim-velocity-control-system"
+      name="gz::sim::systems::VelocityControl">
+    </plugin>
     <!-- physics & atmosphere -->
     <gravity>0 0 -9.81</gravity>
     <!-- lighting -->
