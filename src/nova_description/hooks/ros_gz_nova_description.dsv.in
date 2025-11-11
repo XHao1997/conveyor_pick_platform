@@ -1,1 +1,1 @@
-prepend-non-duplicate;GZ_SIM_RESOURCE_PATH;share;@CMAKE_INSTALL_PREFIX@/share/urdf/meshes/nova2
+prepend-non-duplicate;GZ_SIM_RESOURCE_PATH;share;share/@PROJECT_NAME@/meshes/nova2

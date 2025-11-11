@@ -10,6 +10,10 @@
   <xacro:property name="platform_uri" value="model://platform"/>
   <xacro:property name="platform_base_height" value="0.35"/>
   <xacro:property name="initial_x" value="0.15"/>
+  <xacro:property name="initial_y_cube0" value="1.8"/>
+  <xacro:property name="initial_y_cube1" value="1.6"/>
+  <xacro:property name="initial_y_cube2" value="1.4"/>
+  <xacro:property name="initial_y_cube3" value="1.2"/>
 
   <!-- Reusable macro to include a model with pose -->
 <xacro:macro name="spawn_model" params="name uri x y z roll pitch yaw static:=true">
@@ -71,20 +75,20 @@
     <xacro:spawn_model
         name="container_l"
         uri="${container_l_uri}"
-        x="${initial_x}" y="0" z="${0.11+platform_base_height}"
+        x="${initial_x}" y="${initial_y_cube0}" z="${0.11+platform_base_height}"
         roll="0" pitch="0" yaw="0"
         static="false"/>
 
     <xacro:spawn_model
         name="container_m"
         uri="${container_m_uri}"
-        x="${initial_x}" y="0" z="${0.12+platform_base_height}"
+        x="${initial_x}" y="${initial_y_cube0}" z="${0.12+platform_base_height}"
         roll="0" pitch="0" yaw="0"
         static="false"/>
     <xacro:spawn_model
         name="object"
         uri="${object_uri}"
-        x="${initial_x}" y="0" z="${0.13+platform_base_height}"
+        x="${initial_x}" y="${initial_y_cube0}" z="${0.13+platform_base_height}"
         roll="0" pitch="0" yaw="0"
         static="false"/>
     <xacro:spawn_model
@@ -113,11 +117,31 @@
         static="true"/>                
     
     <xacro:spawn_model
-        name="sliding_cube"
+        name="sliding_cube0"
         uri="${sliding_cube_uri}"
-        x="${initial_x}" y="0" z="${0.1+platform_base_height}"
+        x="${initial_x}" y="${initial_y_cube0}" z="${0.1+platform_base_height}"
         roll="0" pitch="0" yaw="0"
         static="false"/>
+
+    <xacro:spawn_model
+        name="sliding_cube1"
+        uri="${sliding_cube_uri}"
+        x="${initial_x}" y="${initial_y_cube1}" z="${0.1+platform_base_height}"
+        roll="0" pitch="0" yaw="0"
+        static="false"/>
+
+    <xacro:spawn_model
+        name="sliding_cube2"
+        uri="${sliding_cube_uri}"
+        x="${initial_x}" y="${initial_y_cube2}" z="${0.1+platform_base_height}"
+        roll="0" pitch="0" yaw="0"
+        static="false"/>
+    <xacro:spawn_model
+        name="sliding_cube3"
+        uri="${sliding_cube_uri}"
+        x="${initial_x}" y="${initial_y_cube3}" z="${0.1+platform_base_height}"
+        roll="0" pitch="0" yaw="0"
+        static="false"/>        
     <xacro:spawn_model
         name="platform"
         uri="${platform_uri}"

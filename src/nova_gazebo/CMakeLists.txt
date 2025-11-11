@@ -28,6 +28,7 @@ install(DIRECTORY
   launch
   worlds
   custom_models
+  hooks
 #   meshes
 #   rviz
 #   urdf
@@ -35,5 +36,5 @@ install(DIRECTORY
   DESTINATION share/${PROJECT_NAME}
 )
 ament_environment_hooks("${CMAKE_CURRENT_SOURCE_DIR}/hooks/ros_gz_${PROJECT_NAME}.dsv.in")
-ament_environment_hooks("${CMAKE_CURRENT_SOURCE_DIR}/hooks/ros_gz_${PROJECT_NAME}.sh.in")
+# ament_environment_hooks("${CMAKE_CURRENT_SOURCE_DIR}/hooks/ros_gz_${PROJECT_NAME}.sh.in")
 ament_package()

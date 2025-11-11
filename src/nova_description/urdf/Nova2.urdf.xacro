@@ -2,9 +2,9 @@
 <robot name="nova2_robot" xmlns:xacro="http://www.ros.org/wiki/xacro">
   <xacro:arg name="name" default="nova2_robot"/>
   <xacro:arg name="use_ros2_control" default="true"/>
-  <ros>
-    <namespace>${robot_name}</namespace>
-  </ros>
+  <!-- <ros>
+    <namespace>${name}</namespace>
+  </ros> -->
   <xacro:include filename="$(find nova_description)/urdf/nova2.gazebo" />
   <!-- ===== World / dummy / base ===== -->
   <link name="dummy_link"/>

@@ -1,12 +1,16 @@
-<?xml version="1.0" ?>
-<sdf version="1.6">
-  <model name="sliding_cube">
-    <pose>0 0 1 0 0 0</pose>
-    <!-- 设置为动态体 -->
+
+<?xml version="1.0"?>
+<sdf version="1.6" xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <!-- 定义一个变量 name，默认值为 sliding_cube -->
+  <xacro:property name="name" value="sliding_cube"/>
+
+  <model name="${name}">
+    <pose>0 0 0 0 0 0</pose>
     <static>false</static>
 
+    <!-- 负载方块本体 -->
     <link name="link">
-      <!-- 惯性定义（kg, m, kg·m²） -->
       <inertial>
         <mass>0.329</mass>
         <pose>0 0 0.009172 0 0 0</pose>
@@ -14,13 +18,10 @@
           <ixx>5.7268e-4</ixx>
           <iyy>5.6166e-4</iyy>
           <izz>1.1076e-3</izz>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyz>0</iyz>
+          <ixy>0</ixy><ixz>0</ixz><iyz>0</iyz>
         </inertia>
       </inertial>
 
-      <!-- 碰撞体：若几何尺寸以 mm 导出，则应改为米 -->
       <collision name="collision">
         <geometry>
           <mesh>
@@ -29,7 +30,6 @@
         </geometry>
       </collision>
 
-      <!-- 可视体：若 .dae 为 mm 单位，加 scale 进行换算 -->
       <visual name="visual">
         <geometry>
           <mesh>
@@ -38,5 +38,15 @@
         </geometry>
       </visual>
     </link>
+
+    <!-- 用 xacro 变量拼 topic -->
+    <plugin
+      filename="gz-sim-velocity-control-system"
+      name="gz::sim::systems::VelocityControl">
+      <!-- <topic>/${name}/cmd_vel</topic> -->
+      <initial_linear>0 0 0</initial_linear>
+      <initial_angular>0 0 0</initial_angular>
+    </plugin>
+
   </model>
 </sdf>

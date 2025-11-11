@@ -17,16 +17,6 @@ def generate_launch_description():
 
     pkg_nova_gazebo = get_package_share_directory('nova_gazebo')
     pkg_ros_gz_sim = get_package_share_directory('ros_gz_sim')
-    pkg_nova_description = get_package_share_directory('nova_description')
-    # Add your own gazebo library path here
-    gazebo_models_path = os.getcwd() + "/src/nova_gazebo/custom_models"
-    # os.environ["GZ_SIM_RESOURCE_PATH"] += os.pathsep + gazebo_models_path
-    # os.environ["GZ_SIM_RESOURCE_PATH"] += os.pathsep + pkg_nova_description
-    SetEnvironmentVariable(
-        name="GZ_SIM_RESOURCE_PATH",
-        value=[LaunchConfiguration("existing_path"), ":", gazebo_models_path, ":", pkg_nova_description],
-    )
-
 
     gazebo_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
