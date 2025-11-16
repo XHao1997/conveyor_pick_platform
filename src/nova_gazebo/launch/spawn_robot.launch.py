@@ -42,7 +42,7 @@ def spawn_robot(ld, robot_name: str, x: float, y: float, z: float, yaw: float):
         executable="create",
         arguments=[
             "-name", robot_name,
-            "-topic", "robot_description",
+            "-topic", "nova2_robot0/robot_description",
             "-x", str(x),
             "-y", str(y),
             "-z", str(z),
@@ -66,7 +66,7 @@ def generate_launch_description():
         ]),
         " ",
         "use_gazebo:=true ",
-        # "robot_name:=nova2_robot0",
+        "name:=nova2_robot0",
     ])
 
     robot_description = {"robot_description": robot_description_content}
@@ -78,7 +78,7 @@ def generate_launch_description():
         'rviz_config', default_value='rviz.rviz', description='RViz config file'
     )
     world_arg = DeclareLaunchArgument(
-        'world', default_value='test_world.sdf', description='Gazebo world file'
+        'world', default_value='test2_world.sdf', description='Gazebo world file'
     )
     model_arg = DeclareLaunchArgument(
         'model', default_value='Nova2.urdf', description='URDF or Xacro file name'
@@ -123,6 +123,7 @@ def generate_launch_description():
     joint_trajectory_controller_spawner = Node(
         package='controller_manager',
         executable='spawner',
+        namespace='nova2_robot0',
         arguments=[
             'arm_controller',
             '--param-file',
@@ -137,6 +138,8 @@ def generate_launch_description():
     robot_state_publisher_node = Node(
         package='robot_state_publisher',
         executable='robot_state_publisher',
+        namespace='nova2_robot0',
+
         name='robot_state_publisher',
         output='screen',
         parameters=[robot_description],
@@ -144,11 +147,18 @@ def generate_launch_description():
     )
 
 
-
+    ros2_control_node = Node(
+        package='controller_manager',
+        executable='spawner',
+        namespace='/nova2_robot0',
+        arguments=[robot_controllers],
+    )
     # ---------- 控制器（如果你有 ros2_control 配置） ----------
     joint_state_broadcaster_spawner = Node(
         package='controller_manager',
         executable='spawner',
+        namespace='nova2_robot0',
+
         arguments=['joint_state_broadcaster'],
         parameters=[{'use_sim_time': LaunchConfiguration('use_sim_time')}],
         output='screen',

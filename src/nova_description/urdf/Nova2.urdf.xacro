@@ -2,10 +2,7 @@
 <robot name="nova2_robot" xmlns:xacro="http://www.ros.org/wiki/xacro">
   <xacro:arg name="name" default="nova2_robot"/>
   <xacro:arg name="use_ros2_control" default="true"/>
-  <!-- <ros>
-    <namespace>${name}</namespace>
-  </ros> -->
-  <xacro:include filename="$(find nova_description)/urdf/nova2.gazebo" />
+  <xacro:include filename="$(find nova_description)/urdf/nova2.gazebo.xacro" />
   <!-- ===== World / dummy / base ===== -->
   <link name="dummy_link"/>
   <link name="world"/>
@@ -62,7 +59,7 @@
     <parent link="base_link"/>
     <child  link="Link1"/>
     <axis xyz="0 0 -1"/>
-    <limit lower="-6.28" upper="6.28" effort="300" velocity="100"/>
+    <limit lower="-6.28" upper="6.28" effort="300" velocity="200"/>
   </joint>
 
   <link name="Link2">
@@ -88,7 +85,7 @@
     <parent link="Link1"/>
     <child  link="Link2"/>
     <axis xyz="0 0 1"/>
-    <limit lower="-3.14" upper="3.14" effort="300" velocity="100"/>
+    <limit lower="-3.14" upper="3.14" effort="300" velocity="200"/>
   </joint>
 
   <link name="Link3">
@@ -114,7 +111,7 @@
     <parent link="Link2"/>
     <child  link="Link3"/>
     <axis xyz="0 0 1"/>
-    <limit lower="-2.79" upper="2.79" effort="300" velocity="100"/>
+    <limit lower="-2.79" upper="2.79" effort="300" velocity="200"/>
   </joint>
 
   <link name="Link4">
@@ -140,7 +137,7 @@
     <parent link="Link3"/>
     <child  link="Link4"/>
     <axis xyz="0 0 -1"/>
-    <limit lower="-6.28" upper="6.28" effort="300" velocity="100"/>
+    <limit lower="-6.28" upper="6.28" effort="300" velocity="200"/>
   </joint>
 
   <link name="Link5">
@@ -165,7 +162,7 @@
     <parent link="Link4"/>
     <child  link="Link5"/>
     <axis xyz="0 0 -1"/>
-    <limit lower="-6.28" upper="6.28" effort="300" velocity="100"/>
+    <limit lower="-6.28" upper="6.28" effort="300" velocity="200"/>
   </joint>
 
   <link name="Link6">
@@ -190,17 +187,17 @@
     <parent link="Link5"/>
     <child  link="Link6"/>
     <axis xyz="0 0 1"/>
-    <limit lower="-6.28" upper="6.28" effort="300" velocity="100"/>
+    <limit lower="-6.28" upper="6.28" effort="300" velocity="200"/>
   </joint>
 
   <!-- ===== Gazebo per-link visual materials (Gazebo Classic 可见；RViz不受影响) ===== -->
-  <gazebo reference="base_link"><gravity>false</gravity><selfCollide>true</selfCollide><material></material></gazebo>
-  <gazebo reference="Link1"><gravity>false</gravity><selfCollide>true</selfCollide><material></material></gazebo>
-  <gazebo reference="Link2"><gravity>false</gravity><selfCollide>true</selfCollide><material></material></gazebo>
-  <gazebo reference="Link3"><gravity>false</gravity><selfCollide>true</selfCollide><material></material></gazebo>
-  <gazebo reference="Link4"><gravity>false</gravity><selfCollide>true</selfCollide><material></material></gazebo>
-  <gazebo reference="Link5"><gravity>false</gravity><selfCollide>true</selfCollide><material></material></gazebo>
-  <gazebo reference="Link6"><gravity>false</gravity><selfCollide>true</selfCollide><material></material></gazebo>
+  <gazebo reference="base_link"><gravity>true</gravity><selfCollide>true</selfCollide><material></material></gazebo>
+  <gazebo reference="Link1"><gravity>true</gravity><selfCollide>true</selfCollide><material></material></gazebo>
+  <gazebo reference="Link2"><gravity>true</gravity><selfCollide>true</selfCollide><material></material></gazebo>
+  <gazebo reference="Link3"><gravity>true</gravity><selfCollide>true</selfCollide><material></material></gazebo>
+  <gazebo reference="Link4"><gravity>true</gravity><selfCollide>true</selfCollide><material></material></gazebo>
+  <gazebo reference="Link5"><gravity>true</gravity><selfCollide>true</selfCollide><material></material></gazebo>
+  <gazebo reference="Link6"><gravity>true</gravity><selfCollide>true</selfCollide><material></material></gazebo>
 
 
 </robot>
