@@ -2,7 +2,9 @@
 <robot name="nova2_robot" xmlns:xacro="http://www.ros.org/wiki/xacro">
   <xacro:arg name="name" default="nova2_robot"/>
   <xacro:arg name="use_ros2_control" default="true"/>
-  <xacro:include filename="$(find nova_description)/urdf/nova2.gazebo.xacro" />
+  <xacro:arg name="ns"   default="nova2_robot0"/>
+  <xacro:arg name="use_ros2_control" default="true"/>
+
   <!-- ===== World / dummy / base ===== -->
   <link name="dummy_link"/>
   <link name="world"/>
@@ -198,6 +200,85 @@
   <gazebo reference="Link4"><gravity>true</gravity><selfCollide>true</selfCollide><material></material></gazebo>
   <gazebo reference="Link5"><gravity>true</gravity><selfCollide>true</selfCollide><material></material></gazebo>
   <gazebo reference="Link6"><gravity>true</gravity><selfCollide>true</selfCollide><material></material></gazebo>
+    <!-- ros_control plugin -->
+    <gazebo>
+      <plugin
+        filename="gz_ros2_control-system"
+        name="gz_ros2_control::GazeboSimROS2ControlPlugin">
 
+        <!-- your controllers YAML -->
+        <parameters>$(find nova_description)/config/nova2_controllers.yaml</parameters>
+
+        <!-- this is where the namespace is used -->
+        <ros>
+          <namespace>$(arg ns)</namespace>
+          <!-- <remapping>/tf:=/${ns}/tf</remapping>  optional -->
+        </ros>
+      </plugin>
+    </gazebo>
+
+    <!-- joint_state_publisher from Gazebo (optional but handy) -->
+    <gazebo>
+      <plugin
+        filename="gz-sim-joint-state-publisher-system"
+        name="gz::sim::systems::JointStatePublisher">
+        <topic>joint_states</topic>
+        <joint_name>joint1</joint_name>
+        <joint_name>joint2</joint_name>
+        <joint_name>joint3</joint_name>
+        <joint_name>joint4</joint_name>
+        <joint_name>joint5</joint_name>
+        <joint_name>joint6</joint_name>
+      </plugin>
+    </gazebo>
+
+    <!-- ros2_control hardware description -->
+    <ros2_control name="GazeboSimSystem" type="system">
+      <hardware>
+        <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+      </hardware>
+
+      <joint name="joint1">
+        <command_interface name="position"/>
+        <state_interface name="position">
+          <param name="initial_value">0.0</param>
+        </state_interface>
+      </joint>
+
+      <joint name="joint2">
+        <command_interface name="position"/>
+        <state_interface name="position">
+          <param name="initial_value">0.0</param>
+        </state_interface>
+      </joint>
+
+      <joint name="joint3">
+        <command_interface name="position"/>
+        <state_interface name="position">
+          <param name="initial_value">0.0</param>
+        </state_interface>
+      </joint>
+
+      <joint name="joint4">
+        <command_interface name="position"/>
+        <state_interface name="position">
+          <param name="initial_value">0.0</param>
+        </state_interface>
+      </joint>
+
+      <joint name="joint5">
+        <command_interface name="position"/>
+        <state_interface name="position">
+          <param name="initial_value">0.0</param>
+        </state_interface>
+      </joint>
+
+      <joint name="joint6">
+        <command_interface name="position"/>
+        <state_interface name="position">
+          <param name="initial_value">0.0</param>
+        </state_interface>
+      </joint>
+    </ros2_control>
 
 </robot>

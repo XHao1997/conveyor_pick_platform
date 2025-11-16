@@ -1,23 +1,30 @@
+#!/usr/bin/env python3
 import os
+
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+from launch.actions import (
+    DeclareLaunchArgument,
+    IncludeLaunchDescription,
+    TimerAction,
+    GroupAction,
+)
 from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import LaunchConfiguration, PathJoinSubstitution, Command
+from launch.substitutions import (
+    LaunchConfiguration, PathJoinSubstitution, Command, FindExecutable
+)
 from launch_ros.actions import Node
-from ament_index_python.packages import get_package_share_directory
-from launch.substitutions import Command, FindExecutable, PathJoinSubstitution, LaunchConfiguration
 from launch_ros.substitutions import FindPackageShare
+from ament_index_python.packages import get_package_share_directory
+
+
+# ------------------------- Package paths -------------------------
 pkg_nova_description = get_package_share_directory('nova_description')
 pkg_nova_gazebo = get_package_share_directory('nova_gazebo')
 custom_models = os.path.join(pkg_nova_gazebo, 'custom_models')
 
 
-
-robot_positions = {"robot_0": (-0.14, 1.65, 0.351),
-                  "robot_1": (-0.14, 0.65, 0.351),
-                  "robot_2": (0.14, -1.65, 0.351),
-                  "robot_3": (0.14, -0.65, 0.351),}
+# ------------------------- Gazebo resource paths -------------------------
 def _append_env(var: str, path: str):
     cur = os.environ.get(var, '')
     parts = [p for p in cur.split(os.pathsep) if p]
@@ -25,24 +32,61 @@ def _append_env(var: str, path: str):
         parts.append(path)
     os.environ[var] = os.pathsep.join(parts)
 
-# 兼容 gz-sim / ignition / classic 三种变量名
 for var in ("GZ_SIM_RESOURCE_PATH", "IGN_GAZEBO_RESOURCE_PATH", "GAZEBO_MODEL_PATH"):
-    _append_env(var, pkg_nova_description)  # 让 model://nova_description/... 可解析（目录在 share/nova_description）
-    _append_env(var, custom_models)         # 你的自定义模型目录（有 model.config 的那批）
-
-print("GZ_SIM_RESOURCE_PATH=", os.environ.get("GZ_SIM_RESOURCE_PATH", ""))
-print("IGN_GAZEBO_RESOURCE_PATH=", os.environ.get("IGN_GAZEBO_RESOURCE_PATH", ""))
-print("GAZEBO_MODEL_PATH=", os.environ.get("GAZEBO_MODEL_PATH", ""))
+    _append_env(var, pkg_nova_description)
+    _append_env(var, custom_models)
 
 
+# ------------------------- Robots & poses -------------------------
+robot_names = ["nova2_robot0", "nova2_robot1", "nova2_robot2", "nova2_robot3"]
 
-def spawn_robot(ld, robot_name: str, x: float, y: float, z: float, yaw: float):
-    spawn_node = Node(
+robot_poses = {
+    "nova2_robot0": (-0.14,  1.65, 0.351,  3.14/2.0),
+    "nova2_robot1": (-0.14,  0.65, 0.351,  3.14/2.0),
+    "nova2_robot2": ( 0.14, -1.65, 0.351, -3.14/2.0),
+    "nova2_robot3": ( 0.14, -0.65, 0.351, -3.14/2.0),
+}
+
+
+# ------------------------- Helpers -------------------------
+def make_robot_description_cmd(ns: str):
+    return Command([
+        PathJoinSubstitution([FindExecutable(name="xacro")]),
+        " ",
+        PathJoinSubstitution([
+            FindPackageShare("nova_description"),
+            "urdf",
+            "Nova2.urdf.xacro",
+        ]),
+        " ",
+        "use_gazebo:=true ",
+        f"ns:={ns}",
+    ])
+
+
+def rsp_node(ns: str, robot_description_cmd):
+    return Node(
+        package='robot_state_publisher',
+        executable='robot_state_publisher',
+        namespace=ns,
+        name='robot_state_publisher',
+        output='screen',
+        parameters=[{
+            'use_sim_time': LaunchConfiguration('use_sim_time'),
+            'robot_description': robot_description_cmd,
+        }],
+        remappings=[('/tf', 'tf'), ('/tf_static', 'tf_static')],
+    )
+
+
+def spawn_entity_node(ns: str):
+    x, y, z, yaw = robot_poses[ns]
+    return Node(
         package="ros_gz_sim",
         executable="create",
         arguments=[
-            "-name", robot_name,
-            "-topic", "nova2_robot0/robot_description",
+            "-name", ns,
+            "-topic", f"/{ns}/robot_description",
             "-x", str(x),
             "-y", str(y),
             "-z", str(z),
@@ -51,52 +95,70 @@ def spawn_robot(ld, robot_name: str, x: float, y: float, z: float, yaw: float):
         output="screen",
         parameters=[{'use_sim_time': LaunchConfiguration('use_sim_time')}],
     )
-    ld.add_action(spawn_node)
 
 
+def jsb_spawner(ns: str, timeout_sec: float = 60.0):
+    return Node(
+        package='controller_manager',
+        executable='spawner',
+        namespace=ns,
+        arguments=[
+            'joint_state_broadcaster',
+            '--controller-manager-timeout', f'{timeout_sec}',
+            '--controller-manager', f'/{ns}/controller_manager',
+        ],
+        parameters=[{'use_sim_time': LaunchConfiguration('use_sim_time')}],
+        output='screen',
+    )
 
-def generate_launch_description():
-    robot_description_content = Command([
-        PathJoinSubstitution([FindExecutable(name="xacro")]),
-        " ",
-        PathJoinSubstitution([
-            FindPackageShare("nova_description"),
-            "urdf",
-            "Nova2.urdf.xacro"
-        ]),
-        " ",
-        "use_gazebo:=true ",
-        "name:=nova2_robot0",
+
+def arm_spawner(ns: str, controllers_yaml, timeout_sec: float = 10.0):
+    return Node(
+        package='controller_manager',
+        executable='spawner',
+        namespace=ns,
+        arguments=[
+            'arm_controller',
+            '--param-file', controllers_yaml,
+            '--controller-manager-timeout', f'{timeout_sec}',
+            '--controller-manager', f'/{ns}/controller_manager',
+        ],
+        parameters=[{'use_sim_time': LaunchConfiguration('use_sim_time')}],
+        output='screen',
+    )
+
+
+def staged_robot_actions(ns: str,
+                         controllers_yaml,
+                         offset_sec: float,
+                         wait_before_spawn: float = 2.0,
+                         wait_before_controllers: float = 4.0,
+                         cm_timeout: float = 10.0):
+    desc_cmd = make_robot_description_cmd(ns)
+    return GroupAction([
+        TimerAction(period=offset_sec + 0.0, actions=[rsp_node(ns, desc_cmd)]),
+        TimerAction(period=offset_sec + wait_before_spawn, actions=[spawn_entity_node(ns)]),
+        TimerAction(period=offset_sec + wait_before_controllers, actions=[jsb_spawner(ns, cm_timeout)]),
+        TimerAction(period=offset_sec + wait_before_controllers + 0.2,
+                    actions=[arm_spawner(ns, controllers_yaml, cm_timeout)]),
     ])
 
-    robot_description = {"robot_description": robot_description_content}
-    # ---------- Launch 参数 ----------
+
+# ------------------------- Main -------------------------
+def generate_launch_description() -> LaunchDescription:
+    world_arg = DeclareLaunchArgument(
+        'world', default_value='test2_world.sdf', description='Gazebo world file'
+    )
+    sim_time_arg = DeclareLaunchArgument(
+        'use_sim_time', default_value='True', description='use_sim_time flag'
+    )
     rviz_launch_arg = DeclareLaunchArgument(
-        'rviz', default_value='true', description='Open RViz'
+        'rviz', default_value='false', description='Open RViz'
     )
     rviz_config_arg = DeclareLaunchArgument(
         'rviz_config', default_value='rviz.rviz', description='RViz config file'
     )
-    world_arg = DeclareLaunchArgument(
-        'world', default_value='test2_world.sdf', description='Gazebo world file'
-    )
-    model_arg = DeclareLaunchArgument(
-        'model', default_value='Nova2.urdf', description='URDF or Xacro file name'
-    )
-    x_arg = DeclareLaunchArgument('x', default_value='0.0', description='spawn x')
-    y_arg = DeclareLaunchArgument('y', default_value='0.0', description='spawn y')
-    z_arg = DeclareLaunchArgument('z', default_value='1.04', description='spawn z')
-    yaw_arg = DeclareLaunchArgument('yaw', default_value='0.0', description='spawn yaw')
-    sim_time_arg = DeclareLaunchArgument(
-        'use_sim_time', default_value='True', description='use_sim_time flag'
-    )
 
-    # ---------- URDF/Xacro 路径 ----------
-    urdf_file_path = PathJoinSubstitution([
-        pkg_nova_description, "urdf", LaunchConfiguration('model')
-    ])
-
-    # ---------- 启世界 ----------
     world_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(pkg_nova_gazebo, 'launch', 'nova_world.launch.py'),
@@ -104,7 +166,6 @@ def generate_launch_description():
         launch_arguments={'world': LaunchConfiguration('world')}.items()
     )
 
-    # ---------- RViz（可选） ----------
     rviz_node = Node(
         package='rviz2',
         executable='rviz2',
@@ -113,79 +174,38 @@ def generate_launch_description():
         parameters=[{'use_sim_time': LaunchConfiguration('use_sim_time')}],
     )
 
-    robot_controllers = PathJoinSubstitution(
-    [
+    controllers_yaml = PathJoinSubstitution([
         FindPackageShare("nova_description"),
         "config",
         "nova2_controllers.yaml",
-    ]
-    )
-    joint_trajectory_controller_spawner = Node(
-        package='controller_manager',
-        executable='spawner',
-        namespace='nova2_robot0',
-        arguments=[
-            'arm_controller',
-            '--param-file',
-            robot_controllers,
-            ],
-        parameters=[
-            {'use_sim_time': LaunchConfiguration('use_sim_time')},
-        ]
-    )
+    ])
 
-    # ---------- 机器人描述（RSP） ----------
-    robot_state_publisher_node = Node(
-        package='robot_state_publisher',
-        executable='robot_state_publisher',
-        namespace='nova2_robot0',
-
-        name='robot_state_publisher',
-        output='screen',
-        parameters=[robot_description],
-        remappings=[('/tf', 'tf'), ('/tf_static', 'tf_static')],
-    )
-
-
-    ros2_control_node = Node(
-        package='controller_manager',
-        executable='spawner',
-        namespace='/nova2_robot0',
-        arguments=[robot_controllers],
-    )
-    # ---------- 控制器（如果你有 ros2_control 配置） ----------
-    joint_state_broadcaster_spawner = Node(
-        package='controller_manager',
-        executable='spawner',
-        namespace='nova2_robot0',
-
-        arguments=['joint_state_broadcaster'],
-        parameters=[{'use_sim_time': LaunchConfiguration('use_sim_time')}],
-        output='screen',
-    )
     gazebo_bridge = Node(
         package="ros_gz_bridge",
         executable="parameter_bridge",
-        arguments=["/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock"],
+        arguments=["/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock]"],
         output="screen",
     )
+
     ld = LaunchDescription()
-    for a in (gazebo_bridge,rviz_launch_arg, rviz_config_arg, world_arg, model_arg, x_arg, y_arg, z_arg, yaw_arg, sim_time_arg):
-        ld.add_action(a)
+    ld.add_action(world_arg)
+    ld.add_action(sim_time_arg)
+    ld.add_action(rviz_launch_arg)
+    ld.add_action(rviz_config_arg)
     ld.add_action(world_launch)
-    ld.add_action(rviz_node)               # 如果不想开 RViz，可以注释掉
-    ld.add_action(robot_state_publisher_node)
+    ld.add_action(gazebo_bridge)
+    ld.add_action(rviz_node)
 
-    x0, y0, z0 = robot_positions["robot_0"]
-    x1, y1, z1 = robot_positions["robot_1"]
-    x2, y2, z2 = robot_positions["robot_2"]
-    x3, y3, z3 = robot_positions["robot_3"]
-    spawn_robot(ld, "nova2_robot0", x0, y0, z0, 3.14/2)
-    # spawn_robot(ld, "nova2_robot1", x1, y1, z1, 3.14/2)
-    # spawn_robot(ld, "nova2_robot2", x2, y2, z2, -3.14/2)
-    # spawn_robot(ld, "nova2_robot3", x3, y3, z3, -3.14/2)
-
-    ld.add_action(joint_state_broadcaster_spawner)
-    ld.add_action(joint_trajectory_controller_spawner)
+    # Stagger each robot by 3 seconds
+    stagger = 3.0
+    for i, ns in enumerate(robot_names):
+        ld.add_action(staged_robot_actions(
+            ns=ns,
+            controllers_yaml=controllers_yaml,
+            offset_sec=i * stagger,
+            wait_before_spawn=2.0,
+            wait_before_controllers=4.0,
+            cm_timeout=60.0,
+        ))
 
     return ld
