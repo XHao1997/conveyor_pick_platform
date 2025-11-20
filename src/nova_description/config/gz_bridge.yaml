@@ -4,6 +4,30 @@
   gz_type_name: "gz.msgs.Clock"
   direction: "GZ_TO_ROS"
 
+- ros_topic_name: "/sliding_cube0/pose"
+  gz_topic_name: "/model/sliding_cube0/pose"
+  ros_type_name: "geometry_msgs/msg/Pose"
+  gz_type_name: "gz.msgs.Pose"
+  direction: "GZ_TO_ROS"
+
+- ros_topic_name: "/sliding_cube1/pose"
+  gz_topic_name: "/model/sliding_cube1/pose"
+  ros_type_name: "geometry_msgs/msg/Pose"
+  gz_type_name: "gz.msgs.Pose"
+  direction: "GZ_TO_ROS"
+
+- ros_topic_name: "/sliding_cube2/pose"
+  gz_topic_name: "/model/sliding_cube2/pose"
+  ros_type_name: "geometry_msgs/msg/Pose"
+  gz_type_name: "gz.msgs.Pose"
+  direction: "GZ_TO_ROS"
+
+- ros_topic_name: "/sliding_cube3/pose"
+  gz_topic_name: "/model/sliding_cube3/pose"
+  ros_type_name: "geometry_msgs/msg/Pose"
+  gz_type_name: "gz.msgs.Pose"
+  direction: "GZ_TO_ROS"
+
 - ros_topic_name: "/sliding_cube0/cmd_vel"
   gz_topic_name: "/model/sliding_cube0/cmd_vel"
   ros_type_name: "geometry_msgs/msg/Twist"
